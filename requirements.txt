@@ -1,0 +1,4 @@
+Flask
+pyconsul
+requests==2.3.0
+
