@@ -1,11 +1,11 @@
 from agent_client import AgentClient
 
-from .task import *
+from .container import *
 
 class Node:
     def __init__(self, host):
         self.host = host
 
-    def tasks(self):
+    def containers(self):
         client = AgentClient(self.host)
-        return client.tasks()
+        return client.containers()

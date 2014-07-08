@@ -6,15 +6,20 @@ class AgentClient:
         self.host = host
         self.port = 5000
 
-    def start_task(self):
-        r = requests.post("{}/tasks".format(self.__base_url()))
+    def start_container(self, service):
+        payload = {"service": service.replace("-", "_")}
+        r = requests.post("{}/containers".format(self.__base_url()), data=payload)
         return json.loads(r.text)
 
-    def stop_task(self, task_id):
-        requests.delete("{}/task/{}".format(self.__base_url(), task_id))
+    def stop_container(self, container_id):
+        requests.delete("{}/container/{}".format(self.__base_url(), container_id))
 
-    def tasks(self):
-        r = requests.get("{}/tasks".format(self.__base_url()))
+    def container(self, id):
+        r = requests.get("{}/container/{}".format(self.__base_url(), id))
+        return json.loads(r.text)
+
+    def containers(self):
+        r = requests.get("{}/containers".format(self.__base_url()))
         return json.loads(r.text)
 
     def __base_url(self):
