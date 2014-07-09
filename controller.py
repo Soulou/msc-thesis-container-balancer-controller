@@ -2,12 +2,12 @@
 
 from random import randint
 from flask import Flask
-from flask import json
 from flask import request
 from flask import Response
 from consul import Consul
 from models import Container
 from models import ContainerJSONEncoder
+import json
 
 app = Flask(__name__)
 app.debug = True
