@@ -9,3 +9,7 @@ class Node:
     def containers(self):
         client = AgentClient(self.host)
         return client.containers()
+
+    def status(self):
+        client = AgentClient(self.host)
+        return client.status()

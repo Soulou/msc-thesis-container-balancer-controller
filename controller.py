@@ -21,6 +21,27 @@ def app_status():
         containers[node.host] = node.containers()
     return json.dumps(containers)
 
+@app.route("/node/<host>/status", methods=['GET'])
+def app_node_status(host):
+    consul = Consul()
+    nodes = consul.nodes()
+    node_hosts = map((lambda n: n.host), Consul().nodes())
+    try:
+        index = node_hosts.index(host)
+    except ValueError:
+        return Response("{} is not in the cluster".format(node), status=422)
+
+    return json.dumps(nodes[index].status())
+
+@app.route("/nodes-status", methods=['GET'])
+def app_nodes_status():
+    consul = Consul()
+    nodes = consul.nodes()
+    statuses = {}
+    for node in nodes:
+        statuses[node.host] = node.status()
+    return json.dumps(statuses)
+
 @app.route("/node/<host>/containers", methods=['GET'])
 def app_node_containers(host):
     nodes = Consul().nodes()
