@@ -17,7 +17,7 @@ class Container:
 
     def port(self):
         port_bindings = self.info["NetworkSettings"]["Ports"]
-        for remote_port, bindings in port_bindings.iteritems():
+        for remote_port, bindings in port_bindings.items():
             return bindings[0]["HostPort"]
 
     def service(self):

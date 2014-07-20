@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 
 from random import randint
 from flask import Flask
@@ -45,7 +45,7 @@ def app_nodes_status():
 @app.route("/node/<host>/containers", methods=['GET'])
 def app_node_containers(host):
     nodes = Consul().nodes()
-    node_hosts = map((lambda n: n.host), Consul().nodes())
+    node_hosts = list(map((lambda n: n.host), Consul().nodes()))
     try:
         index = node_hosts.index(host)
     except ValueError:
@@ -67,7 +67,7 @@ def app_new_container():
 
 @app.route("/container/<host>/<container_id>", methods=['DELETE'])
 def app_delete_container(host, container_id):
-    hosts = map((lambda n: n.host), Consul().nodes())
+    hosts = list(map((lambda n: n.host), Consul().nodes()))
     try:
         hosts.index(host)
     except ValueError:
