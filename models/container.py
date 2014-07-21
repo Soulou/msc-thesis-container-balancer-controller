@@ -30,6 +30,11 @@ class Container:
         front.remove_backend(self.service(), host, self.port())
         return agent.stop_container(id)
 
+    def to_item(self):
+        agent = AgentClient(self.host)
+        metrics = agent.status_container(self.info['Id'])
+        return [metrics["cpu"] / 100, metrics["memory"] // 1000, metrics["net"]["rx"] + metrics["net"]["tx"]]
+
     @classmethod
     def find(clazz, host, id):
         agent = AgentClient(host)

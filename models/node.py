@@ -8,7 +8,7 @@ class Node:
 
     def containers(self):
         client = AgentClient(self.host)
-        return client.containers()
+        return list(map(lambda c: Container(self.host, c), client.containers()))
 
     def status(self):
         client = AgentClient(self.host)

@@ -19,7 +19,7 @@ def app_status():
     containers = {}
     for node in nodes:
         containers[node.host] = node.containers()
-    return json.dumps(containers)
+    return Response(json.dumps(containers, cls=ContainerJSONEncoder), status=200)
 
 @app.route("/node/<host>/status", methods=['GET'])
 def app_node_status(host):
@@ -57,10 +57,14 @@ def app_node_containers(host):
 def app_balance_containers():
     consul = Consul()
     nodes = consul.nodes()
-    bins = []
+    problem = {"bins": [], "items": []}
     for node in nodes:
-        bins.append(node.to_bin())
-    return json.dumps(bins)
+        containers = node.containers()
+        for container in containers:
+            problem["items"].append(container.to_item())
+        problem["bins"].append(node.to_bin())
+    
+    return json.dumps(problem)
 
 @app.route("/containers", methods=['POST'])
 def app_new_container():
