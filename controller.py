@@ -53,6 +53,15 @@ def app_node_containers(host):
 
     return json.dumps(nodes[index].containers())
 
+@app.route("/balance", methods=['POST'])
+def app_balance_containers():
+    consul = Consul()
+    nodes = consul.nodes()
+    bins = []
+    for node in nodes:
+        bins.append(node.to_bin())
+    return json.dumps(bins)
+
 @app.route("/containers", methods=['POST'])
 def app_new_container():
     try:

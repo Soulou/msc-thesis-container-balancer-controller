@@ -13,3 +13,11 @@ class Node:
     def status(self):
         client = AgentClient(self.host)
         return client.status()
+
+    # CPU / RAM / net
+    def to_bin(self):
+        _10_MB = 10 * 1024 * 1024
+        client = AgentClient(self.host)
+        status = client.status()
+        return [len(status["cpus"]), status["memory"], _10_MB]
+
