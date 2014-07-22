@@ -7,6 +7,9 @@ from flask import Response
 from consul import Consul
 from models import Container
 from models import ContainerJSONEncoder
+from balance import Problem
+from balance import ProblemJSONEncoder
+from agent_client import ContainerNotFound
 import json
 
 app = Flask(__name__)
@@ -51,20 +54,29 @@ def app_node_containers(host):
     except ValueError:
         return Response("{} is not in the cluster".format(node), status=422)
 
-    return json.dumps(nodes[index].containers())
+    return Response(json.dumps(nodes[index].containers(), cls=ContainerJSONEncoder), status=200)
 
 @app.route("/balance", methods=['POST'])
 def app_balance_containers():
     consul = Consul()
     nodes = consul.nodes()
-    problem = {"bins": [], "items": []}
+    problem = Problem()
     for node in nodes:
         containers = node.containers()
         for container in containers:
-            problem["items"].append(container.to_item())
-        problem["bins"].append(node.to_bin())
-    
-    return json.dumps(problem)
+            try:
+                problem.items.append(container.to_item())
+            except ContainerNotFound:
+                pass
+        problem.bins.append(node.to_bin())
+    problem.normalize()
+    result = problem.solve()
+    print(problem.items)
+    print(problem.bins)
+    print(result)
+    result['datetime'] = str(result['datetime'])
+    return json.dumps(result)
+    # return Response(json.dumps(problem, cls=ProblemJSONEncoder), status=200)
 
 @app.route("/containers", methods=['POST'])
 def app_new_container():
@@ -75,7 +87,13 @@ def app_new_container():
     consul = Consul()
     nodes = consul.nodes()
     selected_host = nodes[randint(0, len(nodes)-1)].host
-    started_container = Container.create(selected_host, service)
+
+    try:
+        image = request.form['image']
+    except KeyError:
+        image = "soulou/msc-thesis-fibo-http-service"
+
+    started_container = Container.create(selected_host, service, image)
     return Response(json.dumps(started_container, cls=ContainerJSONEncoder), status=201)
 
 @app.route("/container/<host>/<container_id>", methods=['DELETE'])

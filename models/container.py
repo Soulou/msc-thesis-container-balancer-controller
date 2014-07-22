@@ -41,9 +41,9 @@ class Container:
         return Container(host, agent.container(id))
 
     @classmethod
-    def create(clazz, host, service):
+    def create(clazz, host, service, image):
         agent = AgentClient(host)       
-        container = Container(host, agent.start_container(service))
+        container = Container(host, agent.start_container(service, image))
 
         front.add_backend(service, host, container.port())
         return Container(host, container.info)
