@@ -66,6 +66,9 @@ def app_balance_containers():
         containers += node.containers()
         problem.bins.append(node.to_bin())
 
+    print(containers)
+    print(len(containers))
+
     for container in containers:
         try:
             problem.items.append(container.to_item())
