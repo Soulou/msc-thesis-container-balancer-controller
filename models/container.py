@@ -21,8 +21,10 @@ class Container:
             return bindings[0]["HostPort"]
 
     def service(self):
-        print(self.info)
-        return self.info['Name'].split("-")[0][1:]
+        try:
+            return self.info['Name'].split("-")[0][1:]
+        except KeyError:
+            return self.info['Names'][0].split("-")[0][1:]
 
     def migrate(self, node):
         new_container = Container.create(node, self.service())
