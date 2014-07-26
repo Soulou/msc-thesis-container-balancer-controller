@@ -26,8 +26,14 @@ class Container:
         except KeyError:
             return self.info['Names'][0].split("-")[0][1:]
 
+    def image(self):
+        try:
+            return self.info['Config']['Image']
+        except KeyError:
+            return self.info["Image"]
+
     def migrate(self, node):
-        new_container = Container.create(node, self.service())
+        new_container = Container.create(node, self.service(), self.image())
         self.delete()
         return new_container
 
