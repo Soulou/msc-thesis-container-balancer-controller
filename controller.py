@@ -61,22 +61,36 @@ def app_balance_containers():
     consul = Consul()
     nodes = consul.nodes()
     problem = Problem()
+    containers = []
     for node in nodes:
-        containers = node.containers()
-        for container in containers:
-            try:
-                problem.items.append(container.to_item())
-            except ContainerNotFound:
-                pass
+        containers += node.containers()
         problem.bins.append(node.to_bin())
+
+    for container in containers:
+        try:
+            problem.items.append(container.to_item())
+        except ContainerNotFound:
+            pass
+
     problem.normalize()
     result = problem.solve()
-    print(problem.items)
-    print(problem.bins)
-    print(result)
+    mapping = result['mapping']
+    migrations = []
+    for i in range(len(mapping)):
+        # If the node didn't change, next elem of the results
+        if nodes[mapping[i]].host == containers[i].host:
+            next
+
+        # If it has changed, migrate the container to the giving node
+        new_container = containers[i].migrate(nodes[mapping[i]])
+        migrations.append({
+            "Service": container.service(),
+            "Started": { "Node": new_container.host, "Id": new_container.info["Id"]},
+            "Stopped": { "Node": containers[i].host, "Id": containers[i].info["Id"]}
+        })
+
     result['datetime'] = str(result['datetime'])
-    return json.dumps(result)
-    # return Response(json.dumps(problem, cls=ProblemJSONEncoder), status=200)
+    return json.dumps({"items": problem.items, "bins": problem.bins, "result": result, "migrations": migrations})
 
 @app.route("/containers", methods=['POST'])
 def app_new_container():
@@ -109,15 +123,14 @@ def app_delete_container(host, container_id):
 
 @app.route("/container/<host>/<container_id>/migrate", methods=['POST'])
 def app_migrate_container(host, container_id):
+    container = Container.find(host, container_id)
     nodes = Consul().nodes()
     selected_host = nodes[randint(0, len(nodes)-1)].host
 
-    running_container = Container.find(host, container_id)
-    new_container = Container.create(selected_host, running_container.service())
-    running_container.delete()
+    new_container = container.migrate(selected_host)
     return Response(json.dumps(
         {"Started": new_container,
-         "Stopped": running_container}, cls=ContainerJSONEncoder), status=201)
+         "Stopped": container}, cls=ContainerJSONEncoder), status=201)
 
 if __name__ == "__main__":
     app.run(port=5001, host='0.0.0.0')

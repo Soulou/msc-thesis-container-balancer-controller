@@ -23,6 +23,11 @@ class Container:
     def service(self):
         return self.info['Name'].split("-")[0][1:]
 
+    def migrate(self, node):
+        new_container = Container.create(node, self.service())
+        self.delete()
+        return new_container
+
     def delete(self):
         host = self.host
         id = self.info['Id']
