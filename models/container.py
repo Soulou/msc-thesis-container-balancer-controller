@@ -21,6 +21,7 @@ class Container:
             return bindings[0]["HostPort"]
 
     def service(self):
+        print(self.info)
         return self.info['Name'].split("-")[0][1:]
 
     def migrate(self, node):
