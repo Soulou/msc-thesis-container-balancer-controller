@@ -72,9 +72,6 @@ def app_balance_containers():
         except ContainerNotFound:
             pass
 
-    print(problem.items)
-    print(len(problem.items))
-
     problem.normalize()
     result = problem.solve()
     mapping = result['mapping']
