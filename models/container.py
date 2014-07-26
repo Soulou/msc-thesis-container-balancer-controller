@@ -33,7 +33,7 @@ class Container:
             return self.info["Image"]
 
     def migrate(self, node):
-        new_container = Container.create(node, self.service(), self.image())
+        new_container = Container.create(node.host, self.service(), self.image())
         self.delete()
         return new_container
 

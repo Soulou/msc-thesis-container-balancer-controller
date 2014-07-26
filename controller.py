@@ -125,9 +125,9 @@ def app_delete_container(host, container_id):
 def app_migrate_container(host, container_id):
     container = Container.find(host, container_id)
     nodes = Consul().nodes()
-    selected_host = nodes[randint(0, len(nodes)-1)].host
+    selected_node = nodes[randint(0, len(nodes)-1)]
 
-    new_container = container.migrate(selected_host)
+    new_container = container.migrate(selected_node)
     return Response(json.dumps(
         {"Started": new_container,
          "Stopped": container}, cls=ContainerJSONEncoder), status=201)
