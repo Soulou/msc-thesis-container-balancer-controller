@@ -6,7 +6,8 @@ class Consul:
         self.client = pyconsul.http.Consul(host=host, port=port)
 
     def nodes(self):
-        return list(map((lambda peer: Node(peer.split(":")[0])), self.client.status['peers']))
+        consul_nodes = self.client.service("agent")
+        return list(map((lambda node: Node(node["Address"])), consul_nodes))
 
     def agent_port(self, host):
         consul_nodes = self.client.service("agent")
