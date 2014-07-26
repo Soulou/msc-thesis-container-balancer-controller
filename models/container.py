@@ -16,9 +16,12 @@ class Container:
         return self.info
 
     def port(self):
-        port_bindings = self.info["NetworkSettings"]["Ports"]
-        for remote_port, bindings in port_bindings.items():
-            return bindings[0]["HostPort"]
+        try:
+            return self.info['Ports'][0]['PublicPort']
+        except KeyError:
+            port_bindings = self.info["NetworkSettings"]["Ports"]
+            for remote_port, bindings in port_bindings.items():
+                return bindings[0]["HostPort"]
 
     def service(self):
         try:
