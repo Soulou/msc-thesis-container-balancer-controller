@@ -79,7 +79,7 @@ def app_balance_containers():
     for i in range(len(mapping)):
         # If the node didn't change, next elem of the results
         if nodes[mapping[i]].host == containers[i].host:
-            next
+            continue
 
         # If it has changed, migrate the container to the giving node
         new_container = containers[i].migrate(nodes[mapping[i]])
