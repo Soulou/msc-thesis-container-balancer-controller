@@ -1,4 +1,6 @@
 from agent_client import AgentClient
+import time
+import socket
 import front
 import json
 
@@ -10,6 +12,9 @@ class Container:
     def __init__(self, host, info):
         self.host = host
         self.info = info
+
+    def __str__(self):
+        return "<{} - {} - {} - {}>".format(self.host, self.port(), self.service(), self.image())
 
     def to_json(self):
         self.info['Host'] = self.host
@@ -36,7 +41,23 @@ class Container:
             return self.info["Image"]
 
     def migrate(self, node):
-        new_container = Container.create(node.host, self.service(), self.image())
+        new_container = Container.create(node.host, self.service(), self.image(), update_routing = False)
+        boot_success = False
+        for i in range(5):
+            try:
+                s = socket.create_connection((new_container.host, new_container.port()), timeout=1)
+                s.close()
+                boot_success = True
+                break
+            except Exception as e:
+                print(e)
+                time.sleep(1)
+
+        if not boot_success:
+            new_container.delete()
+            raise Exception("{} failed to boot".format(new_container))
+
+        front.add_backend(new_container.service(), new_container.host, new_container.port())
         self.delete()
         return new_container
 
@@ -58,9 +79,10 @@ class Container:
         return Container(host, agent.container(id))
 
     @classmethod
-    def create(clazz, host, service, image):
+    def create(clazz, host, service, image, update_routing=True):
         agent = AgentClient(host)       
         container = Container(host, agent.start_container(service, image))
 
-        front.add_backend(service, host, container.port())
+        if update_routing:
+            front.add_backend(service, host, container.port())
         return Container(host, container.info)
