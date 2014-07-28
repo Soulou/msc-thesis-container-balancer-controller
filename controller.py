@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
-from random import randint
+import argparse
+from flask import current_app
 from flask import Flask
 from flask import request
 from flask import Response
@@ -10,6 +11,7 @@ from models import ContainerJSONEncoder
 from balance import Problem
 from balance import ProblemJSONEncoder
 from agent_client import ContainerNotFound
+from alloc_strategy import AllocationStrategy
 import json
 
 app = Flask(__name__)
@@ -100,14 +102,16 @@ def app_new_container():
         return Response("service field should be provided", status=422)
     consul = Consul()
     nodes = consul.nodes()
-    selected_host = nodes[randint(0, len(nodes)-1)].host
+
+    strategy = AllocationStrategy.from_name(current_app.config['strategy'])
+    selected_node = strategy.select_node(nodes)
 
     try:
         image = request.form['image']
     except KeyError:
         image = "soulou/msc-thesis-fibo-http-service"
 
-    started_container = Container.create(selected_host, service, image)
+    started_container = Container.create(selected_node, service, image)
     return Response(json.dumps(started_container, cls=ContainerJSONEncoder), status=201)
 
 @app.route("/container/<host>/<container_id>", methods=['DELETE'])
@@ -125,7 +129,9 @@ def app_delete_container(host, container_id):
 def app_migrate_container(host, container_id):
     container = Container.find(host, container_id)
     nodes = Consul().nodes()
-    selected_node = nodes[randint(0, len(nodes)-1)]
+
+    strategy = AllocationStrategy.from_name(current_app.config['strategy'])
+    selected_node = strategy.select_node(nodes)
 
     new_container = container.migrate(selected_node)
     return Response(json.dumps(
@@ -133,4 +139,11 @@ def app_migrate_container(host, container_id):
          "Stopped": container}, cls=ContainerJSONEncoder), status=201)
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description='Controller of a container balancer infrastructure')
+    parser.add_argument('--strategy', dest='strategy', default='random',
+        help='Strategy to use for allocating the containers')
+
+    args = parser.parse_args()
+    app.config['strategy'] = args.strategy
+    print("Start controller with {} allocation strategy".format(args.strategy))
     app.run(port=5001, host='0.0.0.0')

@@ -41,7 +41,7 @@ class Container:
             return self.info["Image"]
 
     def migrate(self, node):
-        new_container = Container.create(node.host, self.service(), self.image(), update_routing = False)
+        new_container = Container.create(node, self.service(), self.image(), update_routing = False)
         boot_success = False
         for i in range(5):
             try:
@@ -79,10 +79,10 @@ class Container:
         return Container(host, agent.container(id))
 
     @classmethod
-    def create(clazz, host, service, image, update_routing=True):
-        agent = AgentClient(host)       
-        container = Container(host, agent.start_container(service, image))
+    def create(clazz, node, service, image, update_routing=True):
+        agent = AgentClient(node.host) 
+        container = Container(node.host, agent.start_container(service, image))
 
         if update_routing:
-            front.add_backend(service, host, container.port())
-        return Container(host, container.info)
+            front.add_backend(service, node.host, container.port())
+        return container
