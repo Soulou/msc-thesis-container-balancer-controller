@@ -13,7 +13,7 @@ pip install -r requirements.txt
 
 ```
 export BASE_URL=thesis.dev # Change value if you need
-./controller.py
+./controller.py [--strategy=random]
 ```
 
 ## API

@@ -38,7 +38,7 @@ def app_node_status(host):
 
     return json.dumps(nodes[index].status())
 
-@app.route("/nodes-status", methods=['GET'])
+@app.route("/nodes/status", methods=['GET'])
 def app_nodes_status():
     consul = Consul()
     nodes = consul.nodes()
