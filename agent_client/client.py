@@ -31,7 +31,7 @@ class AgentClient:
         return json.loads(r.text)
 
     def containers_by_service(self, service):
-        r = requests.get("{}/containers?service=".format(self.__base_url(), service))
+        r = requests.get("{}/containers?service={}".format(self.__base_url(), service))
         return json.loads(r.text)
 
     def status(self):
