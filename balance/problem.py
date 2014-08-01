@@ -10,6 +10,8 @@ class ProblemJSONEncoder(json.JSONEncoder):
         return o.to_json()
 
 class Problem:
+    RESERVE = 0.2
+
     def __init__(self):
         self.items = []
         self.bins = []
@@ -43,7 +45,7 @@ class Problem:
             for i in self.items:
                 i[d] = round(i[d] / max_dim, 4)
             for b in self.bins:
-                b[d] = round(b[d] / max_dim, 4)
+                b[d] = round(b[d] / max_dim * (1 - RESERVE), 4)
 
     def _get_bin_max_dimension(self, dim):
         m = self.items[0][dim]

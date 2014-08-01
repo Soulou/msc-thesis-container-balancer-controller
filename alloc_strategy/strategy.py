@@ -51,7 +51,10 @@ class AnyFitAllocationStrategy(AllocationStrategy):
         items = self._get_service_metrics(nodes, service)
         if len(items) == 0:
             return [0, 0, 0], bins
-        return (self._average_of_items(items), bins)
+        item = self._average_of_items(items)
+        print(item)
+        print(bins)
+        return item, bins
 
     def _get_service_metrics(self, nodes, service):
         containers = []

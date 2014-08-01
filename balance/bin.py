@@ -17,6 +17,10 @@ class Bin:
     def __setitem__(self, index, value):
         self.capacity[index] = value
 
+    def __str__(self):
+        self._update_remaining_capacity()
+        return "<{} - {} - {}>".format(str(self.node), self.capacity, self.remaining_capacity)
+
     def to_json(self):
         return self.capacity
 
@@ -42,6 +46,6 @@ class Bin:
             net += value
 
         self.remaining_capacity[0] = self.capacity[0] - (cpu / 100)
-        self.remaining_capacity[1] = self.capacity[1] - status["free_memory"]
+        self.remaining_capacity[1] = status["free_memory"]
         self.remaining_capacity[2] = self.capacity[2] - net
 

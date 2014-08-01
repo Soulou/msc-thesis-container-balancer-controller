@@ -8,6 +8,9 @@ class Node:
     def __init__(self, host):
         self.host = host
 
+    def __str__():
+        return self.host
+
     def containers(self):
         client = AgentClient(self.host)
         return list(map(lambda c: Container(self.host, c), client.containers()))
