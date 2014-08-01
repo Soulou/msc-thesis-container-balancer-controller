@@ -53,7 +53,7 @@ class AnyFitAllocationStrategy(AllocationStrategy):
             return [0, 0, 0], bins
         item = self._average_of_items(items)
         print(item)
-        print(bins)
+        print(list(map(lambda b: str(b), bins)))
         return item, bins
 
     def _get_service_metrics(self, nodes, service):
