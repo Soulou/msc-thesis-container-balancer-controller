@@ -28,7 +28,7 @@ class Problem:
             if len(i) != self.dimensions:
                 raise InvalidProblem("all items don't have {} dimensions".format(self.dimensions))
         for b in self.bins:
-            if len(b) != self.dimensions:
+            if b.dimensions != self.dimensions:
                 raise InvalidProblem("all bins don't have{} dimensions".format(self.dimensions))
 
     def solve(self):

@@ -1,5 +1,7 @@
 from agent_client import AgentClient
 
+from balance import Bin
+
 from .container import *
 
 class Node:
@@ -10,6 +12,10 @@ class Node:
         client = AgentClient(self.host)
         return list(map(lambda c: Container(self.host, c), client.containers()))
 
+    def containers_by_service(self, service):
+        client = AgentClient(self.host)
+        return list(map(lambda c: Container(self.host, c), client.containers_by_service(service)))
+
     def status(self):
         client = AgentClient(self.host)
         return client.status()
@@ -19,5 +25,5 @@ class Node:
         _10_MB = 10 * 1024 * 1024
         client = AgentClient(self.host)
         status = client.status()
-        return [len(status["cpus"]), status["memory"], _10_MB]
+        return Bin(self, [len(status["cpus"]), status["memory"], _10_MB])
 

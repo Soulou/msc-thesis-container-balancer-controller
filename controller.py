@@ -10,6 +10,7 @@ from models import Container
 from models import ContainerJSONEncoder
 from balance import Problem
 from balance import ProblemJSONEncoder
+from balance import BinJSONEncoder
 from agent_client import ContainerNotFound
 from alloc_strategy import AllocationStrategy
 import json
@@ -60,8 +61,7 @@ def app_node_containers(host):
 
 @app.route("/balance", methods=['POST'])
 def app_balance_containers():
-    consul = Consul()
-    nodes = consul.nodes()
+    nodes = Consul().nodes()
     problem = Problem()
     containers = []
     for node in nodes:
@@ -92,7 +92,7 @@ def app_balance_containers():
         })
 
     result['datetime'] = str(result['datetime'])
-    return json.dumps({"items": problem.items, "bins": problem.bins, "result": result, "migrations": migrations})
+    return json.dumps({"items": problem.items, "bins": problem.bins, "result": result, "migrations": migrations}, cls=BinJSONEncoder)
 
 @app.route("/containers", methods=['POST'])
 def app_new_container():
@@ -104,7 +104,7 @@ def app_new_container():
     nodes = consul.nodes()
 
     strategy = AllocationStrategy.from_name(current_app.config['strategy'])
-    selected_node = strategy.select_node(nodes)
+    selected_node = strategy.select_node(nodes, service)
 
     try:
         image = request.form['image']
