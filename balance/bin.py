@@ -29,6 +29,8 @@ class Bin:
         return self.remaining_capacity
 
     def has_capacity_for(self, item):
+        print(self)
+        print(item)
         self._update_remaining_capacity()
         for i in range(self.dimensions):
             if item[i] > self.remaining_capacity[i]:
