@@ -8,7 +8,7 @@ class Node:
     def __init__(self, host):
         self.host = host
 
-    def __str__():
+    def __str__(self):
         return self.host
 
     def containers(self):
