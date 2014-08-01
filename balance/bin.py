@@ -1,5 +1,7 @@
 import json
 
+from .problem import Problem
+
 class BinJSONEncoder(json.JSONEncoder):
     def default(self, o):
         return o.to_json()
@@ -33,7 +35,7 @@ class Bin:
         print(item)
         self._update_remaining_capacity()
         for i in range(self.dimensions):
-            if item[i] > self.remaining_capacity[i]:
+            if item[i] > self.remaining_capacity[i] * (1 - Problem.RESERVE):
                 return False
         return True
 
