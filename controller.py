@@ -137,7 +137,7 @@ def app_migrate_container(host, cid):
     nodes = Node.all()
 
     strategy = AllocationStrategy.from_name(current_app.config['strategy'])
-    selected_node = strategy.select_node(nodes)
+    selected_node = strategy.select_node(nodes, container.service())
 
     new_container = container.migrate(selected_node)
     return Response(json.dumps(
