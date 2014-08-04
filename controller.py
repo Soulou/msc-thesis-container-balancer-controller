@@ -117,6 +117,8 @@ def app_new_container():
 
 @app.route("/container/<host>/<cid>", methods=['DELETE'])
 def app_delete_container(host, cid):
+    print(host)
+    print(cid)
     try:
         node = Node.find(host)
     except ValueError:
