@@ -1,4 +1,5 @@
 from agent_client import AgentClient
+from consul import Consul
 
 from balance import Bin
 
@@ -29,4 +30,14 @@ class Node:
         client = AgentClient(self.host)
         status = client.status()
         return Bin(self, [len(status["cpus"]), status["memory"], _10_MB])
+
+    @classmethod
+    def find(clazz, host):
+        node_hosts = Consul().nodes()
+        index = node_hosts.index(host)
+        return Node(node_hosts[index])
+
+    @classmethod
+    def all(clazz):
+        return list(map(lambda host: Node(host), Consul().nodes()))
 

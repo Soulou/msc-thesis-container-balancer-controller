@@ -5,7 +5,7 @@ from flask import current_app
 from flask import Flask
 from flask import request
 from flask import Response
-from consul import Consul
+from models import Node
 from models import Container
 from models import ContainerJSONEncoder
 from balance import Problem
@@ -20,8 +20,7 @@ app.debug = True
 
 @app.route("/status", methods=['GET'])
 def app_status():
-    consul = Consul()
-    nodes = consul.nodes()
+    nodes = Node.all()
     containers = {}
     for node in nodes:
         containers[node.host] = node.containers()
@@ -29,20 +28,16 @@ def app_status():
 
 @app.route("/node/<host>/status", methods=['GET'])
 def app_node_status(host):
-    consul = Consul()
-    nodes = consul.nodes()
-    node_hosts = map((lambda n: n.host), Consul().nodes())
     try:
-        index = node_hosts.index(host)
+        node = Node.find(host)
     except ValueError:
         return Response("{} is not in the cluster".format(node), status=422)
 
-    return json.dumps(nodes[index].status())
+    return json.dumps(node.status())
 
 @app.route("/nodes/status", methods=['GET'])
 def app_nodes_status():
-    consul = Consul()
-    nodes = consul.nodes()
+    nodes = Node.all()
     statuses = {}
     for node in nodes:
         statuses[node.host] = node.status()
@@ -50,18 +45,25 @@ def app_nodes_status():
 
 @app.route("/node/<host>/containers", methods=['GET'])
 def app_node_containers(host):
-    nodes = Consul().nodes()
-    node_hosts = list(map((lambda n: n.host), Consul().nodes()))
     try:
-        index = node_hosts.index(host)
+        node = Node.find(host)
     except ValueError:
         return Response("{} is not in the cluster".format(node), status=422)
+    return Response(json.dumps(node.containers(), cls=ContainerJSONEncoder), status=200)
 
-    return Response(json.dumps(nodes[index].containers(), cls=ContainerJSONEncoder), status=200)
+@app.route("/node/<host>/<cid>/status", methods=['GET'])
+def app_node_container_status(host, cid):
+    try:
+        node = Node.find(host)
+    except ValueError:
+        return Response("{} is not in the cluster".format(node), status=422)
+    container = Container.find(node, cid)
+    return json.dumps(container.status())
+
 
 @app.route("/balance", methods=['POST'])
 def app_balance_containers():
-    nodes = Consul().nodes()
+    nodes = Node.all()
     problem = Problem()
     containers = []
     for node in nodes:
@@ -100,8 +102,7 @@ def app_new_container():
         service = request.form['service']
     except KeyError:
         return Response("service field should be provided", status=422)
-    consul = Consul()
-    nodes = consul.nodes()
+    nodes = Node.all()
 
     strategy = AllocationStrategy.from_name(current_app.config['strategy'])
     selected_node = strategy.select_node(nodes, service)
@@ -114,21 +115,26 @@ def app_new_container():
     started_container = Container.create(selected_node, service, image)
     return Response(json.dumps(started_container, cls=ContainerJSONEncoder), status=201)
 
-@app.route("/container/<host>/<container_id>", methods=['DELETE'])
-def app_delete_container(host, container_id):
-    hosts = list(map((lambda n: n.host), Consul().nodes()))
+@app.route("/container/<host>/<cid>", methods=['DELETE'])
+def app_delete_container(host, cid):
     try:
-        hosts.index(host)
+        node = Node.find(host)
     except ValueError:
         return Response("{} is not in the cluster".format(host), status=422)
 
-    Container.find(host, container_id).delete()
+    Container.find(node, cid).delete()
     return Response("", status=204)
 
-@app.route("/container/<host>/<container_id>/migrate", methods=['POST'])
-def app_migrate_container(host, container_id):
-    container = Container.find(host, container_id)
-    nodes = Consul().nodes()
+@app.route("/container/<host>/<cid>/migrate", methods=['POST'])
+def app_migrate_container(host, cid):
+    try:
+        node = Node.find(host)
+    except ValueError:
+        return Response("{} is not in the cluster".format(host), status=422)
+
+    container = Container.find(node, cid)
+
+    nodes = Node.all()
 
     strategy = AllocationStrategy.from_name(current_app.config['strategy'])
     selected_node = strategy.select_node(nodes)
