@@ -91,11 +91,9 @@ class BestFitAllocationStrategy(AnyFitAllocationStrategy):
         return self.best_fit(item, bins, nodes)
 
     def best_fit(self, item, bins, nodes):
-        best_remaining_capacity = bins[0].get_remaining_capacity()
-        best_fit_index = 0
+        best_remaining_capacity = [100, 100, 100]
+        best_fit_index = -1
         for index in range(len(bins)):
-            if index == 0:
-                continue
             if not bins[index].has_capacity_for(item):
                 continue
             rem_capacity = bins[index].get_remaining_capacity()
@@ -122,7 +120,7 @@ class WorstFitAllocationStrategy(AnyFitAllocationStrategy):
             if rem_capacity[0] > worst_remaining_capacity[0]:
                 worst_remaining_capacity = rem_capacity
                 worst_fit_index = index
-        if best_fit_index == -1:
+        if worst_remaining_capacity[0] == 0 and bins[0].get_remaining_capacity[0] < item[0]:
             raise "Not enough capacity in the cluster"
         return nodes[worst_fit_index]
 
