@@ -91,7 +91,7 @@ class BestFitAllocationStrategy(AnyFitAllocationStrategy):
         return self.best_fit(item, bins)
 
     def best_fit(self, item, bins):
-        best_remaining_capacity = [bins[0].get_remaining_capacity()]
+        best_remaining_capacity = bins[0].get_remaining_capacity()
         best_fit_index = 0
         for index in range(len(bins)):
             if index == 0:
@@ -111,7 +111,7 @@ class WorstFitAllocationStrategy(AnyFitAllocationStrategy):
         (item, bins) = self.generate_problem(nodes, service)
         return self.worst_fit(item, bins)
     def worst_fit(self, item, nodes):
-        worst_remaining_capacity = [bins[0].get_remaining_capacity()]
+        worst_remaining_capacity = bins[0].get_remaining_capacity()
         worst_fit_index = 0
         for index in range(len(bins)):
             if index == 0:
