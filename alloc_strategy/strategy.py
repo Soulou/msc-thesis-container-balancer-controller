@@ -14,6 +14,10 @@ class AllocationStrategy(metaclass=ABCMeta):
             return FirstFitAllocationStrategy()
         elif name == "best-fit":
             return BestFitAllocationStrategy()
+        elif name == "worst-fit":
+            return WorstFitAllocationStrategy()
+        elif name == "best-worst-fit":
+            return BestWorstFitAllocationStrategy()
         else:
             raise "Strategy {} not implemented.".format(name)
 
@@ -84,23 +88,52 @@ class FirstFitAllocationStrategy(AnyFitAllocationStrategy):
 class BestFitAllocationStrategy(AnyFitAllocationStrategy):
     def select_node(self, nodes, service):
         (item, bins) = self.generate_problem(nodes, service)
-        is_first = True
-        best_remaining_capacity = []
-        best_fit_index = -1
+        return self.best_fit(item, bins)
+
+    def best_fit(self, item, bins):
+        best_remaining_capacity = [bins[0].get_remaining_capacity()]
+        best_fit_index = 0
         for index in range(len(bins)):
+            if index == 0:
+                continue
             if not bins[index].has_capacity_for(item):
                 continue
             rem_capacity = bins[index].get_remaining_capacity()
-            if is_first:
-                best_remaining_capacity = rem_capacity
-                best_fit_index = index
-                is_first = False
-            if rem_capacity[0] > item[0] and rem_capacity[0] < best_remaining_capacity[0]:
+            if rem_capacity[0] < best_remaining_capacity[0]:
                 best_remaining_capacity = rem_capacity
                 best_fit_index = index
         if best_fit_index == -1:
             raise "Not enough capacity in the cluster"
-        return nodes[index]
+        return nodes[best_fit_index]
+
+class WorstFitAllocationStrategy(AnyFitAllocationStrategy)
+    def select_node(self, nodes, service):
+        (item, bins) = self.generate_problem(nodes, service)
+        return self.worst_fit(item, bins)
+    def worst_fit(self, item, nodes):
+        worst_remaining_capacity = [bins[0].get_remaining_capacity()]
+        worst_fit_index = 0
+        for index in range(len(bins)):
+            if index == 0:
+                continue
+            if not bins[index].has_capacity_for(item):
+                continue
+            rem_capacity = bins[index].get_remaining_capacity()
+            if rem_capacity[0] > worst_remaining_capacity[0]:
+                worst_remaining_capacity = rem_capacity
+                worst_fit_index = index
+        if best_fit_index == -1:
+            raise "Not enough capacity in the cluster"
+        return nodes[worst_fit_index]
+
+class BestWorstFitAllocationStrategy(AnyFitAllocationStrategy):
+    def select_node(self, nodes, service):
+        (item, bins) = self.generate_problem(nodes, service)
+        if item[0] != 0:
+            return BestFitAllocationStrategy().best_fit(item, bins)
+        else:
+            return WorstFitAllocationStrategy().worst_fit(item, bins)
+
 
 
 
@@ -108,3 +141,5 @@ AllocationStrategy.register(RandomAllocationStrategy)
 AllocationStrategy.register(RoundRobinAllocationStrategy)
 AllocationStrategy.register(FirstFitAllocationStrategy)
 AllocationStrategy.register(BestFitAllocationStrategy)
+AllocationStrategy.register(WorstFitAllocationStrategy)
+AllocationStrategy.register(BestWorstFitAllocationStrategy)
