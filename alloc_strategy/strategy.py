@@ -106,7 +106,7 @@ class BestFitAllocationStrategy(AnyFitAllocationStrategy):
             raise "Not enough capacity in the cluster"
         return nodes[best_fit_index]
 
-class WorstFitAllocationStrategy(AnyFitAllocationStrategy)
+class WorstFitAllocationStrategy(AnyFitAllocationStrategy):
     def select_node(self, nodes, service):
         (item, bins) = self.generate_problem(nodes, service)
         return self.worst_fit(item, bins)
