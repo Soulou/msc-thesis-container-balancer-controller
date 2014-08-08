@@ -88,9 +88,9 @@ class FirstFitAllocationStrategy(AnyFitAllocationStrategy):
 class BestFitAllocationStrategy(AnyFitAllocationStrategy):
     def select_node(self, nodes, service):
         (item, bins) = self.generate_problem(nodes, service)
-        return self.best_fit(item, bins)
+        return self.best_fit(item, bins, nodes)
 
-    def best_fit(self, item, bins):
+    def best_fit(self, item, bins, nodes):
         best_remaining_capacity = bins[0].get_remaining_capacity()
         best_fit_index = 0
         for index in range(len(bins)):
@@ -109,8 +109,8 @@ class BestFitAllocationStrategy(AnyFitAllocationStrategy):
 class WorstFitAllocationStrategy(AnyFitAllocationStrategy):
     def select_node(self, nodes, service):
         (item, bins) = self.generate_problem(nodes, service)
-        return self.worst_fit(item, bins)
-    def worst_fit(self, item, nodes):
+        return self.worst_fit(item, bins, nodes)
+    def worst_fit(self, item, bins, nodes):
         worst_remaining_capacity = bins[0].get_remaining_capacity()
         worst_fit_index = 0
         for index in range(len(bins)):
@@ -130,12 +130,9 @@ class BestWorstFitAllocationStrategy(AnyFitAllocationStrategy):
     def select_node(self, nodes, service):
         (item, bins) = self.generate_problem(nodes, service)
         if item[0] != 0:
-            return BestFitAllocationStrategy().best_fit(item, bins)
+            return BestFitAllocationStrategy().best_fit(item, bins, nodes)
         else:
-            return WorstFitAllocationStrategy().worst_fit(item, bins)
-
-
-
+            return WorstFitAllocationStrategy().worst_fit(item, bins, nodes)
 
 AllocationStrategy.register(RandomAllocationStrategy)
 AllocationStrategy.register(RoundRobinAllocationStrategy)
