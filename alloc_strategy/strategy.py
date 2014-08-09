@@ -18,6 +18,8 @@ class AllocationStrategy(metaclass=ABCMeta):
             return WorstFitAllocationStrategy()
         elif name == "best-worst-fit":
             return BestWorstFitAllocationStrategy()
+        elif name == "first-worst-fit":
+            return FirstWorstFitAllocationStrategy()
         else:
             raise "Strategy {} not implemented.".format(name)
 
@@ -80,6 +82,9 @@ class AnyFitAllocationStrategy(AllocationStrategy):
 class FirstFitAllocationStrategy(AnyFitAllocationStrategy):
     def select_node(self, nodes, service):
         (item, bins) = self.generate_problem(nodes, service)
+        return self.first_fit(item, bins, nodes)
+
+    def first_fit(self, item, bins, nodes):
         for index in range(len(bins)):
             if bins[index].has_capacity_for(item):
                 return nodes[index]
@@ -132,9 +137,18 @@ class BestWorstFitAllocationStrategy(AnyFitAllocationStrategy):
         else:
             return WorstFitAllocationStrategy().worst_fit(item, bins, nodes)
 
+class FirstWorstFitAllocationStrategy(AnyFitAllocationStrategy):
+    def select_node(self, nodes, service):
+        (item, bins) = self.generate_problem(nodes, service)
+        if item[0] != 0:
+            return FirstFitAllocationStrategy().first_fit(item, bins, nodes)
+        else:
+            return WorstFitAllocationStrategy().worst_fit(item, bins, nodes)
+
 AllocationStrategy.register(RandomAllocationStrategy)
 AllocationStrategy.register(RoundRobinAllocationStrategy)
 AllocationStrategy.register(FirstFitAllocationStrategy)
 AllocationStrategy.register(BestFitAllocationStrategy)
 AllocationStrategy.register(WorstFitAllocationStrategy)
 AllocationStrategy.register(BestWorstFitAllocationStrategy)
+AllocationStrategy.register(FirstWorstFitAllocationStrategy)
