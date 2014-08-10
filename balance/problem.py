@@ -43,10 +43,17 @@ class Problem:
             self.bins_remove_reserve()
             return pack_vectors(self._to_algo_problem(), family='stillwell_current', 
                        pack='pack_by_items', select='none', itemsort='none', binsort='none')
+        elif self.algorithm == "brandao2013mvp":
+            self.bins_remove_reserve()
+            return pack_vectors(problem=self._to_algo_problem(), family='brandao2013mvp')
+        elif self.algorithm == "gabay2013vsv":
+            self.bins_remove_reserve()
+            return pack_vectors(self._to_algo_problem(), family='gabay2013vsv')
         elif self.algorithm == "first-fit-decreasing":
             return FirstFitDecreasing.pack(self.items, self.bins)
         elif self.algorithm == "best-fit-decreasing":
             return BestFitDecreasing.pack(self.items, self.bins)
+
 
     def bins_remove_reserve(self):
         for b in self.bins:
