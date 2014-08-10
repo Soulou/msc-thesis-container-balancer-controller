@@ -40,7 +40,7 @@ class Problem:
         if self.algorithm == "stillwell":
             # In the internal algorithms the reserve is automatically managed
             # In external libs, it's important to remove it from bins before packing
-            self.bins_keep_reserve()
+            self.bins_remove_reserve()
             return pack_vectors(self._to_algo_problem(), family='stillwell_current', 
                        pack='pack_by_items', select='none', itemsort='none', binsort='none')
         elif self.algorithm == "first-fit-decreasing":
@@ -48,8 +48,8 @@ class Problem:
         elif self.algorithm == "best-fit-decreasing":
             return BestFitDecreasing.pack(self.items, self.bins)
 
-    def bins_keep_reserve(self):
-        for b in bins:
+    def bins_remove_reserve(self):
+        for b in self.bins:
             for d in range(self.dimensions):
                 b[d] = b[d] * (1 - Problem.RESERVE)
 
