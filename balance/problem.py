@@ -13,7 +13,7 @@ class Problem:
     RESERVE = 0.2
 
     def __init__(self, algorithm="stillwell"):
-        self.algorighm = algorithm
+        self.algorithm = algorithm
         self.items = []
         self.bins = []
 
@@ -40,6 +40,8 @@ class Problem:
                        pack='pack_by_items', select='none', itemsort='none', binsort='none')
         elif self.algorithm == "first-fit-decreasing":
             return FirstFitDeacreasing.pack(self.items, self.bins)
+        elif self.algorithm == "best-fit-decreasing":
+            return BestFitDeacreasing.pack(self.items, self.bins)
 
     def normalize(self):
         self.validate()
