@@ -19,5 +19,5 @@ class FirstFitDecreasing:
                     mapping[sorted_items_with_index[i_index][0]] = b_index
                     break
 
-        return {"algorithn": "first-fit-decreasing", "mapping": mapping}
+        return {"algorithm": "first-fit-decreasing", "mapping": mapping}
 

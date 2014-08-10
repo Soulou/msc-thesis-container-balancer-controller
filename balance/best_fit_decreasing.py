@@ -26,4 +26,4 @@ class BestFitDecreasing:
             bins[best_index].add_item(sorted_items_with_index[i_index][1:])
             mapping[sorted_items_with_index[i_index][0]] = best_index
 
-        return {"algorithn": "best-fit-decreasing", "mapping": mapping}
+        return {"algorithm": "best-fit-decreasing", "mapping": mapping}
