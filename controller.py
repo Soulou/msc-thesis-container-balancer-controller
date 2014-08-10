@@ -65,7 +65,7 @@ def app_node_container_status(host, cid):
 def app_balance_containers():
     strategy = None
     try:
-        strategy = request.form["request"]
+        strategy = request.form["strategy"]
     except ValueError:
         pass
 
