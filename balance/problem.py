@@ -62,6 +62,7 @@ class Problem:
                 i[d] = round(i[d] / max_dim, 4)
             for b in self.bins:
                 b[d] = round(b[d] / max_dim, 4)
+                b.remaining_capacity[d] = round(b.remaining_capacity[d] / max_dim, 4)
 
     def _get_bin_max_dimension(self, dim):
         m = self.items[0][dim]

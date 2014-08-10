@@ -14,7 +14,7 @@ class FirstFitDecreasing:
 
         for i_index in range(len(sorted_items_with_index)):
             for b_index in range(len(bins)):
-                if bins[b_index].has_capacity_for(sorted_items_with_index[i_index][1:], "offline"):
+                if bins[b_index].has_capacity_for(sorted_items_with_index[i_index][1:], type="offline"):
                     bins[b_index].add_item(sorted_items_with_index[i_index][1:])
                     mapping[sorted_items_with_index[i_index][0]] = b_index
                     break
