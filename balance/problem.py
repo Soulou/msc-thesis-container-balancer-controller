@@ -12,7 +12,8 @@ class ProblemJSONEncoder(json.JSONEncoder):
 class Problem:
     RESERVE = 0.2
 
-    def __init__(self):
+    def __init__(self, algorithm="stillwell"):
+        self.algorighm = algorithm
         self.items = []
         self.bins = []
 
@@ -34,8 +35,11 @@ class Problem:
                 raise InvalidProblem("all bins don't have{} dimensions".format(self.dimensions))
 
     def solve(self):
-        return pack_vectors(self._to_algo_problem(), family='stillwell_current', 
-                   pack='pack_by_items', select='none', itemsort='none', binsort='none')
+        if self.algorithm == "stillwell":
+            return pack_vectors(self._to_algo_problem(), family='stillwell_current', 
+                       pack='pack_by_items', select='none', itemsort='none', binsort='none')
+        elif self.algorithm == "first-fit-decreasing":
+            return FirstFitDeacreasing.pack(self.items, self.bins)
 
     def normalize(self):
         self.validate()

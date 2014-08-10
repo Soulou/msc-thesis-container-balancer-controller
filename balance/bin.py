@@ -20,24 +20,30 @@ class Bin:
         self.capacity[index] = value
 
     def __str__(self):
-        self._update_remaining_capacity()
         return "<{} - {} - {}>".format(str(self.node), self.capacity, self.remaining_capacity)
 
     def to_json(self):
         return self.capacity
 
-    def get_remaining_capacity(self):
-        self._update_remaining_capacity()
+    def get_remaining_capacity(self, type="online"):
+        if type == "online":
+            self._update_remaining_capacity()
         return self.remaining_capacity
 
-    def has_capacity_for(self, item):
+    def has_capacity_for(self, item, type="online"):
         print(self)
         print(item)
-        self._update_remaining_capacity()
+        if type == "online":
+            self._update_remaining_capacity()
         for i in range(self.dimensions):
-            if item[i] > self.remaining_capacity[i] * (1 - Problem.RESERVE):
+            if item[i] > self.remaining_capacity[i] - self.capacity[i] * Problem.RESERVE:
                 return False
         return True
+
+    # For offline bin packing, we remove the used capacity here
+    def add_item(self, item):
+        for i in range(self.dimensions):
+            self.remaining_capacity[i] -= item[i]
 
     def _update_remaining_capacity(self):
         status = self.node.status()
