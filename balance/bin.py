@@ -23,7 +23,7 @@ class Bin:
         return "<{} - {} - {}>".format(str(self.node), self.capacity, self.remaining_capacity)
 
     def to_json(self):
-        return self.capacity
+        return { "capacity": self.capacity, "remaining_capacity": self.remaining_capacity }
 
     def get_remaining_capacity(self, type="online"):
         if type == "online":
