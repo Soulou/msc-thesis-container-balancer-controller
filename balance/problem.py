@@ -38,12 +38,20 @@ class Problem:
 
     def solve(self):
         if self.algorithm == "stillwell":
+            # In the internal algorithms the reserve is automatically managed
+            # In external libs, it's important to remove it from bins before packing
+            self.bins_keep_reserve()
             return pack_vectors(self._to_algo_problem(), family='stillwell_current', 
                        pack='pack_by_items', select='none', itemsort='none', binsort='none')
         elif self.algorithm == "first-fit-decreasing":
             return FirstFitDecreasing.pack(self.items, self.bins)
         elif self.algorithm == "best-fit-decreasing":
             return BestFitDecreasing.pack(self.items, self.bins)
+
+    def bins_keep_reserve(self):
+        for b in bins:
+            for d in range(self.dimensions):
+                b[d] = b[d] * (1 - Problem.RESERVE)
 
     def normalize(self):
         self.validate()
@@ -53,7 +61,7 @@ class Problem:
             for i in self.items:
                 i[d] = round(i[d] / max_dim, 4)
             for b in self.bins:
-                b[d] = round(b[d] / max_dim * (1 - Problem.RESERVE), 4)
+                b[d] = round(b[d] / max_dim, 4)
 
     def _get_bin_max_dimension(self, dim):
         m = self.items[0][dim]
