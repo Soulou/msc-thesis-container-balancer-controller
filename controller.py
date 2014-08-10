@@ -94,7 +94,7 @@ def app_balance_containers():
         # If it has changed, migrate the container to the giving node
         new_container = containers[i].migrate(nodes[mapping[i]])
         migrations.append({
-            "Service": container.service(),
+            "Service": containers[i].service(),
             "Started": { "Node": new_container.host, "Id": new_container.info["Id"]},
             "Stopped": { "Node": containers[i].host, "Id": containers[i].info["Id"]}
         })
