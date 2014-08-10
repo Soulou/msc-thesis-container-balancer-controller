@@ -1,6 +1,8 @@
 import json
 
 from vectorpack import pack_vectors
+from .first_fit_decreasing import FirstFitDecreasing
+from .best_fit_decreasing import BestFitDecreasing
 
 class InvalidProblem(Exception):
     pass
@@ -39,9 +41,9 @@ class Problem:
             return pack_vectors(self._to_algo_problem(), family='stillwell_current', 
                        pack='pack_by_items', select='none', itemsort='none', binsort='none')
         elif self.algorithm == "first-fit-decreasing":
-            return FirstFitDeacreasing.pack(self.items, self.bins)
+            return FirstFitDecreasing.pack(self.items, self.bins)
         elif self.algorithm == "best-fit-decreasing":
-            return BestFitDeacreasing.pack(self.items, self.bins)
+            return BestFitDecreasing.pack(self.items, self.bins)
 
     def normalize(self):
         self.validate()

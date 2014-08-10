@@ -99,7 +99,11 @@ def app_balance_containers():
             "Stopped": { "Node": containers[i].host, "Id": containers[i].info["Id"]}
         })
 
-    result['datetime'] = str(result['datetime'])
+    try:
+        result['datetime'] = str(result['datetime'])
+    except:
+        pass
+
     return json.dumps({"items": problem.items, "bins": problem.bins, "result": result, "migrations": migrations}, cls=BinJSONEncoder)
 
 @app.route("/containers", methods=['POST'])
