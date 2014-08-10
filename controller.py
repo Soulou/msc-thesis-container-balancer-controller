@@ -63,8 +63,14 @@ def app_node_container_status(host, cid):
 
 @app.route("/balance", methods=['POST'])
 def app_balance_containers():
+    strategy = None
+    try:
+        strategy = request.form["request"]
+    except ValueError:
+        pass
+
     nodes = Node.all()
-    problem = Problem()
+    problem = Problem(strategy)
     containers = []
     for node in nodes:
         containers += node.containers()
