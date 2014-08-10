@@ -69,8 +69,14 @@ def app_balance_containers():
     except ValueError:
         pass
 
+    opts = None
+    try:
+        opts = request.form["opts"]
+    except:
+        pass
+
     nodes = Node.all()
-    problem = Problem(strategy)
+    problem = Problem(strategy, opts)
     containers = []
     for node in nodes:
         containers += node.containers()

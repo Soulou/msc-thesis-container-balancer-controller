@@ -14,8 +14,13 @@ class ProblemJSONEncoder(json.JSONEncoder):
 class Problem:
     RESERVE = 0.2
 
-    def __init__(self, algorithm="stillwell"):
+    def __init__(self, algorithm="stillwell", opts=""):
         self.algorithm = algorithm
+        self.opts = {}
+        for opt in opts.split(";"):
+            key, value = opt.split("=")
+            self.opts[key] = value
+
         self.items = []
         self.bins = []
 
@@ -41,14 +46,13 @@ class Problem:
             # In the internal algorithms the reserve is automatically managed
             # In external libs, it's important to remove it from bins before packing
             self.bins_remove_reserve()
-            return pack_vectors(self._to_algo_problem(), family='stillwell_current', 
-                       pack='pack_by_items', select='none', itemsort='none', binsort='none')
+            return pack_vectors(self._to_algo_problem(), family='stillwell_current', **self.opts)
         elif self.algorithm == "brandao2013mvp":
             self.bins_remove_reserve()
-            return pack_vectors(problem=self._to_algo_problem(), family='brandao2013mvp')
+            return pack_vectors(self._to_algo_problem(), family='brandao2013mvp', **self.opts)
         elif self.algorithm == "gabay2013vsv":
             self.bins_remove_reserve()
-            return pack_vectors(self._to_algo_problem(), family='gabay2013vsv')
+            return pack_vectors(self._to_algo_problem(), family='gabay2013vsv', **self.opts)
         elif self.algorithm == "first-fit-decreasing":
             return FirstFitDecreasing.pack(self.items, self.bins)
         elif self.algorithm == "best-fit-decreasing":
